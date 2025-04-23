@@ -8,6 +8,7 @@ from tinydb import TinyDB
 # Ensure the directory exists
 if not os.path.exists(os.path.join(os.path.expanduser("~"), "Documents", "YahtzeeCalc")):
     os.makedirs(os.path.join(os.path.expanduser("~"), "Documents", "YahtzeeCalc"))
+    
 # Path to the roll data file
 ROLL_DATA_FILE = os.path.join(os.path.join(os.path.join(os.path.expanduser("~"), "Documents"), "YahtzeeCalc"), "roll_data.json")
 
