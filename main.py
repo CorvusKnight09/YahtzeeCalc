@@ -62,7 +62,7 @@ def calculate_scores(dice, played_categories):
     """Calculate scores for all categories based on the current dice roll, excluding played categories."""
     return {category: func(dice) for category, func in CATEGORIES.items() if category not in played_categories}
 
-def recommend_rerolls(dice, roll_data, max_rerolls=3):
+def recommend_rerolls(dice, roll_data, played_categories, max_rerolls=3):
     # Count frequency of individual numbers from roll_data
     number_frequency = Counter()
     for roll, freq in roll_data.items():
@@ -92,13 +92,15 @@ def recommend_rerolls(dice, roll_data, max_rerolls=3):
 
                 # Bias toward keeping frequent numbers
                 bonus = sum(1 for d in simulated_dice if d in most_common_numbers)
-                adjusted_score = max(calculate_scores(simulated_dice, set()).values()) * weight * (1 + 0.1 * bonus)
+                adjusted_score = max(
+                    calculate_scores(simulated_dice, played_categories).values()
+                ) * weight * (1 + 0.1 * bonus)
                 scores.append(adjusted_score)
 
             expected_values[reroll_indices] = sum(scores) / len(scores)
 
     if not expected_values:
-        return [], max(calculate_scores(dice, set()).values())
+        return [], max(calculate_scores(dice, played_categories).values())
 
     best_reroll_indices = max(expected_values, key=expected_values.get)
     best_reroll_values = [dice[i] for i in best_reroll_indices]
@@ -130,7 +132,9 @@ def main():
 
         while roll_count < 3:  # Allow up to 2 rerolls
             # Recommend rerolls
-            reroll_indices, expected_reroll_value = recommend_rerolls(dice, roll_data, max_rerolls=2 - roll_count)
+            reroll_indices, expected_reroll_value = recommend_rerolls(
+                dice, roll_data, played_categories, max_rerolls=2 - roll_count
+            )
 
             # Calculate scores, excluding played categories
             scores = calculate_scores(dice, played_categories)
@@ -146,7 +150,7 @@ def main():
                 roll_count = 0  # Reset reroll count after scoring
                 break
             else:
-                if roll_count <= 3:
+                if roll_count < 3:
                     print(f"\nRecommended action: Reroll dice with {reroll_indices} (Expected value: {expected_reroll_value:.2f}).")
                     time.sleep(3)
                     roll_count += 1  # Increment reroll count
