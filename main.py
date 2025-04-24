@@ -58,6 +58,29 @@ def save_roll_data(roll_data):
     for roll_key, count in roll_data.items():
         rolls_table.insert({"roll": list(roll_key), "count": count})
 
+def undo_last_roll(roll_data):
+    """Undo the last roll from TinyDB."""
+    if not rolls_table.all():
+        print("No rolls to undo.")
+        time.sleep(3)
+        return roll_data
+
+    # Get the last roll entry
+    last_entry = rolls_table.all()[-1]
+    last_roll = tuple(last_entry["roll"])
+
+    # Decrease the count for the last roll or remove it if count reaches 0
+    if roll_data[last_roll] > 1:
+        roll_data[last_roll] -= 1
+    else:
+        del roll_data[last_roll]
+
+    # Remove the last entry from the database
+    rolls_table.remove(doc_ids=[last_entry.doc_id])
+    print(f"Removed the last roll: {last_roll}.")
+    time.sleep(3)
+    return roll_data
+
 def calculate_scores(dice, played_categories):
     """Calculate scores for all categories based on the current dice roll, excluding played categories."""
     return {category: func(dice) for category, func in CATEGORIES.items() if category not in played_categories}
@@ -112,6 +135,7 @@ def main():
     time.sleep(3)
     roll_count = 0  # Initialize reroll count for a turn
     played_categories = set()  # Keep track of categories already used in the game
+    category_history = []  # Keep track of played category history
 
     # Load roll data
     roll_data = load_roll_data()
@@ -119,7 +143,29 @@ def main():
     while True:
         clear()
         # Get user input
-        input_dice = input("Enter your dice roll (e.g., 1 2 3 4 5): \n").strip()
+        input_dice = input("Enter your dice roll (e.g., 1 2 3 4 5) or type 'back' to undo the last action: \n").strip()
+        if input_dice.lower() == "back":
+            if rolls_table.all() and category_history:
+                roll_data = undo_last_roll(roll_data)  # Undo the last roll
+                last_category = category_history.pop()  # Remove the last played category
+                played_categories.remove(last_category)  # Undo the played category
+                print(f"Removed the last played category: '{last_category.replace('_', ' ')}'.")
+                time.sleep(3)
+                continue
+            elif rolls_table.all():
+                roll_data = undo_last_roll(roll_data)  # Undo the last roll
+                continue
+            elif category_history:
+                last_category = category_history.pop()  # Remove the last played category
+                played_categories.remove(last_category)  # Undo the played category
+                print(f"Removed the last played category: '{last_category.replace('_', ' ')}'.")
+                time.sleep(3)
+                continue
+            else:
+                print("No rolls or categories to undo.")
+                time.sleep(3)
+                continue
+
         try:
             dice = list(map(int, input_dice.split()))
             if len(dice) != 5 or any(d < 1 or d > 6 for d in dice):
@@ -129,6 +175,10 @@ def main():
             print("Invalid input. Please enter five numbers between 1 and 6.")
             time.sleep(3)
             continue
+
+        roll_key = tuple(sorted(dice))
+        roll_data[roll_key] += 1  # Update roll data
+        rolls_table.insert({"roll": list(roll_key), "count": roll_data[roll_key]})  # Save roll to TinyDB
 
         while roll_count < 3:  # Allow up to 2 rerolls
             # Recommend rerolls
@@ -147,6 +197,7 @@ def main():
                 print(f"\nRecommended action: Score in '{formatted_category}' for {best_score} points.")
                 time.sleep(3)
                 played_categories.add(best_category)  # Mark the category as played
+                category_history.append(best_category)  # Save the played category to history
                 roll_count = 0  # Reset reroll count after scoring
                 break
             else:
@@ -165,11 +216,8 @@ def main():
             print(f"\nReroll limit reached. Recommended action: Score in '{formatted_category}' for {best_score} points.")
             time.sleep(3)
             played_categories.add(best_category)  # Mark the category as played
+            category_history.append(best_category)  # Save the played category to history
             roll_count = 0  # Reset reroll count after forced scoring
-
-        # Update roll data
-        roll_key = tuple(sorted(dice))
-        roll_data[roll_key] += 1
 
         # Save the updated roll data to the database
         save_roll_data(roll_data)
