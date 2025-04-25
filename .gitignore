@@ -1,4 +1,4 @@
-.github
-dist
-icon.ico
-requirements.txt
+*.github
+*dist
+*icon.ico
+*requirements.txt
