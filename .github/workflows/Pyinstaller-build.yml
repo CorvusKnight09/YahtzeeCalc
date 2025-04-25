@@ -16,7 +16,7 @@ jobs:
           main: main
           dist: ./dist
           python_version: 3.13.3
-          pyinstaller_version: 5.12.0
+          pyinstaller_version: 6.12.0
           artifact: YahtzeeCalc.exe
           use-dependencies: true
           no-console: true
