@@ -1,2 +1,1 @@
 tinydb==4.8.2
-pyinstaller==6.12.0

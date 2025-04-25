@@ -10,21 +10,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup
-        run: |
-          echo "Installing requirements..."
-          pip install -r requirements.txt
-          echo "Requirements installed."
-          echo "Configuring git..."
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          echo "Git configured"
-          echo "Setup done!"
-          
-      - name: Pyinstaller build
-        run: pyinstaller main.py -F -n YahtzeeCalc -i icon.ico
-      
-      - name: Push to repository
-        run: |
-          git add -f dist; git commit -m "Build executable"
-          git push
+      - name: Build executable
+        uses: CorvusKnight09/Pyinstaller-Windows-Action@v1.0.0
+        with:
+          main: main.py
+          artifact: YahtzeeCalc
+          icon: icon.ico
