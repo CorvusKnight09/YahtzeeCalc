@@ -145,17 +145,10 @@ def main():
         # Get user input
         input_dice = input("Enter your dice roll (e.g., 1 2 3 4 5) or type 'back' to undo the last action: \n").strip()
         if input_dice.lower() == "back":
-            if rolls_table.all() and category_history:
-                roll_data = undo_last_roll(roll_data)  # Undo the last roll
-                last_category = category_history.pop()  # Remove the last played category
-                played_categories.remove(last_category)  # Undo the played category
-                print(f"Removed the last played category: '{last_category.replace('_', ' ')}'.")
-                time.sleep(3)
-                continue
-            elif rolls_table.all():
+            if rolls_table.all() and LastPlayedWasCategory == False:
                 roll_data = undo_last_roll(roll_data)  # Undo the last roll
                 continue
-            elif category_history:
+            elif category_history and LastPlayedWasCategory == True:
                 last_category = category_history.pop()  # Remove the last played category
                 played_categories.remove(last_category)  # Undo the played category
                 print(f"Removed the last played category: '{last_category.replace('_', ' ')}'.")
@@ -199,12 +192,14 @@ def main():
                 played_categories.add(best_category)  # Mark the category as played
                 category_history.append(best_category)  # Save the played category to history
                 roll_count = 0  # Reset reroll count after scoring
+                LastPlayedWasCategory = True
                 break
             else:
                 if roll_count < 3:
                     print(f"\nRecommended action: Reroll dice with {reroll_indices} (Expected value: {expected_reroll_value:.2f}).")
                     time.sleep(3)
                     roll_count += 1  # Increment reroll count
+                    LastPlayedWasCategory = False
                     break  # Exit loop to simulate reroll (user would reroll and re-enter dice)
 
         if roll_count >= 3:
@@ -218,6 +213,7 @@ def main():
             played_categories.add(best_category)  # Mark the category as played
             category_history.append(best_category)  # Save the played category to history
             roll_count = 0  # Reset reroll count after forced scoring
+            LastPlayedWasCategory = True
 
         # Save the updated roll data to the database
         save_roll_data(roll_data)
