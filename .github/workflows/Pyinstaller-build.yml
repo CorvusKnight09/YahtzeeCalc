@@ -10,9 +10,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Build executable
-        uses: CorvusKnight09/Pyinstaller-Windows-Action
-        with:
-          main: main.py
-          artifact: YahtzeeCalc
-          icon: icon.ico
+      - name: Setup
+        run: |
+          pip install -r requirements.txt
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+      - name: Pyinstaller build
+        run: pyinstaller main.py -F -n YahtzeeCalc -i icon.ico
+      
+      - name: Push to repository
+        run: |
+          git add -f dist; git commit -m "Build executable"
+          git push
