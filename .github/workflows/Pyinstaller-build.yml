@@ -1,0 +1,13 @@
+name: Pyinstaller build
+run-name: ${{ github.actor }} is building Executable
+on: [push]
+uses: eric2788/pyinstaller-build@0.1.3
+  with:
+    main: main
+    dist: ./dist
+    python_version: 3.13.3
+    pyinstaller_version: 6.13.0
+    artifact: YahtzeeCalc
+    use-dependencies: true
+    no-console: true
+    icon: icon.ico
