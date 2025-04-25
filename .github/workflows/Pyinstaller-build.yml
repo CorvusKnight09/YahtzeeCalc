@@ -26,5 +26,5 @@ jobs:
       
       - name: Push to repository
         run: |
-          git add dist; git commit -m "Build executable"
+          git add -f dist; git commit -m "Build executable"
           git push
