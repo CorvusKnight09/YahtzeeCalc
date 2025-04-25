@@ -7,6 +7,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+          persist-credentials: false
 
       - name: Pyinstaller build
         uses: eric2788/pyinstaller-build@0.1.3
@@ -22,7 +25,7 @@ jobs:
       
       - name: configure git and push to remote
         run: |
-          git config --global user.name "Ultronic1987"
-          git config --global user.email "Ultronic1987@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "1084659+github-actions[bot]@users.noreply.github.com"
           git add dist; git commit -m "Build executable"
           git push
