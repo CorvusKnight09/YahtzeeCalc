@@ -19,7 +19,7 @@ jobs:
           pyinstaller_version: 6.12.0
           artifact: YahtzeeCalc.exe
           use-dependencies: true
-          no-console: true
+          no-console: false
           icon: icon.ico
       
       - name: configure git and push to remote
