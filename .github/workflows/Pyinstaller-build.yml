@@ -17,7 +17,7 @@ jobs:
           dist: ./dist
           python_version: 3.13.3
           pyinstaller_version: 6.13.0
-          artifact: YahtzeeCalc
+          artifact: YahtzeeCalc.exe
           use-dependencies: true
           no-console: true
           icon: icon.ico
@@ -26,5 +26,5 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add dist; git commit -m "Build executable"
+          git add ./dist; git commit -m "Build executable"
           git push
