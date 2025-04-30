@@ -36,9 +36,7 @@ CATEGORIES = {
 def clear():
     if platform.system() == "Windows":
         os.system('cls')
-    elif platform.system() == "Linux":
-        os.system('clear')
-    elif platform.system() == "Darwin":
+    elif platform.system() == "Linux" or platform.system() == "Darwin":
         os.system('clear')
     else:
         print("Unsupported OS. Unable to clear the screen.")
