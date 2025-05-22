@@ -179,8 +179,14 @@ def main():
 
             # Calculate scores, excluding played categories
             scores = calculate_scores(dice, played_categories)
-            best_category = max(scores, key=scores.get)
-            best_score = scores[best_category]
+            # Prefer non-chance categories if possible
+            non_chance_scores = {cat: val for cat, val in scores.items() if cat != "chance"}
+            if non_chance_scores and any(val > 0 for val in non_chance_scores.values()):
+                best_category = max(non_chance_scores, key=non_chance_scores.get)
+                best_score = non_chance_scores[best_category]
+            else:
+                best_category = max(scores, key=scores.get)
+                best_score = scores[best_category]
             formatted_category = best_category.replace("_", " ")
 
             # Decide whether to reroll or score
