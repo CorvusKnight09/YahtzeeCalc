@@ -1,3 +1,4 @@
 .github/
-./icon.ico
-./requirements.txt
+dist/
+icon.ico
+requirements.txt
