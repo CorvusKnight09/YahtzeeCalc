@@ -13,7 +13,6 @@
 ---
 
 **Features i want to add:**
-- Exclusion of "Chance" until absolutely needed.
 - Win/Loss counter.
 - Built in scorekeeper.
     - Hidden main program until hotkey is pressed.
